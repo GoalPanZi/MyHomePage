@@ -27,7 +27,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <header className="bg-black-100 p-10">
+          <h1 className="text-xl font-bold text-black text-center dark:invert font-calibri">My App Header</h1>
+        </header>
+        <main className ="p-4">{children}</main>
+        <footer className="bg-gray-800 text-white text-center p-2 font-calibri">
+          &copy; Taeseok Lee
+        </footer>
       </body>
     </html>
   );

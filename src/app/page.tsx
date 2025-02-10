@@ -8,8 +8,8 @@ export default function Home() {
           className="dark:invert"
           src="/next.svg"
           alt="Next.js logo"
-          width={180}
-          height={38}
+          width={300}
+          height={100}
           priority
         />
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
@@ -20,7 +20,10 @@ export default function Home() {
             </code>
             .
           </li>
-          <li>Save and see your changes instantly.</li>
+          <li className="mb-2">Save and see your changes instantly.</li>
+          <li className="mb-2 bg-blue-500">
+            First, Open page.tsx
+          </li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">

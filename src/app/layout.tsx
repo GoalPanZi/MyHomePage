@@ -25,13 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-800 flex flex-col min-h-screen`}
       >
         <header className="bg-black-100 p-10">
-          <h1 className="text-xl font-bold text-black text-center dark:invert font-calibri">My App Header</h1>
+          <h1 className="font-bold text-white text-center dark:invert text-3xl">Header, need to Change Later</h1>
         </header>
-        <main className ="p-4">{children}</main>
-        <footer className="bg-gray-800 text-white text-center p-2 font-calibri">
+        <main className ="flex-grow p-4">{children}</main>
+        <footer className="bg-gray-800 text-white text-center p-2">
           &copy; Taeseok Lee
         </footer>
       </body>

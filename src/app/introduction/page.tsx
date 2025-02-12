@@ -1,7 +1,7 @@
 export default function introduction() {
     return (
-        <h2>
+        <p>
             Hello, I am Taeseok Lee!
-        </h2>
+        </p>
     )
 }

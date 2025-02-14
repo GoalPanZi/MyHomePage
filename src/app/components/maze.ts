@@ -21,11 +21,11 @@ export default class Maze{
                 for (let i = 0 ; i < this.total_cell_count; i++){
                     this.grid.push(new MazeCellSquare(i));
                 }
-                for (let j = 0; j < rows-1; j++) {
-                    for (let i = 0; i < cols-1; i++) {
+                for (let j = 0; j < rows; j++) {
+                    for (let i = 0; i < cols; i++) {
                         let index = i + j*cols;
-                        this.grid[index].connect(1, this.grid[index+1],3);
-                        this.grid[index].connect(2, this.grid[index+cols],0);
+                        if (i+1 < cols) this.grid[index].connect(1, this.grid[index+1],3);
+                        if (j+1 < rows) this.grid[index].connect(2, this.grid[index+cols],0);
                     }
                 }
             default:
@@ -40,6 +40,8 @@ export default class Maze{
 
     generateOne() {
         if (this.visited.length == this.total_cell_count) {
+            this.current = this.grid[this.start];
+            this.path = [this.start];
             return;
         }
         let movable = this.current.getMovable(this.visited);
@@ -47,16 +49,21 @@ export default class Maze{
             this.current = this.grid[this.path.pop()!];
             movable = this.current.getMovable(this.visited);
         }
+        this.path.push(this.current.index);
         let wallIndex = movable[Math.floor(Math.random()*movable.length)];
         this.current.openWall(wallIndex);
         this.current = this.current.connected[wallIndex]!;
         this.path.push(this.current.index);
+        this.visited.push(this.current.index);
     }
 
     draw(left : number, top : number, mazeSize: number) {
         if (this.ctx == null) {
             return;
         }
+        this.ctx.fillStyle = "white";
+        this.ctx.fillRect(0,0, this.ctx.canvas.width, this.ctx.canvas.height);
+
         let cellSize = mazeSize / this.rows;
         for (let j =0 ; j< this.rows; j++) {
             for (let i =0; i < this.cols; i++) {
@@ -69,9 +76,27 @@ export default class Maze{
         let sy = top + cellSize * (Math.floor(this.current.index/this.cols) + 0.5);
         this.ctx.fillStyle = "red";
         this.ctx.beginPath();
-        this.ctx.ellipse(sx, sy, cellSize * 0.25, cellSize * 0.25, 0, 0, 2*Math.PI);
+        this.ctx.ellipse(sx, sy, cellSize * 0.1, cellSize * 0.1, 0, 0, 2*Math.PI);
         this.ctx.fill();
 
+        //Draw Path
+        let lpadding = left + cellSize * 0.5;
+        let tpadding = top + cellSize * 0.5;
+        this.ctx.strokeStyle = "red";
+        this.ctx.lineJoin = "round";
+        this.ctx.lineWidth = cellSize*0.1;
+        if (this.path.length >=2) {
+            this.ctx.beginPath();
+            let cx = lpadding;
+            let cy = tpadding;
+            this.ctx.moveTo(cx,cy);
+            for (let i = 0; i< this.path.length-1; i++) {
+                let nx = (this.path[i+1] % this.cols) * cellSize;
+                let ny = Math.floor(this.path[i+1] / this.cols) * cellSize;
+                this.ctx.lineTo(nx+lpadding,ny+tpadding);
+                this.ctx.stroke();
+            }
+        }
 
         // Drawing outer Box
         this.ctx.strokeStyle = "black";
@@ -81,11 +106,13 @@ export default class Maze{
     }
 }
 
-class MazeCell{
+abstract class MazeCell{
     points: [number, number][]; // Vertex of each cell clockwise, Top Left corner = [0,0], Waill i of Mazecell = [points[i], points[i+1]]
     connected: (MazeCell | null)[]; // Other Mazecell connected at i-th edge, -1 by default
     blocked: boolean[]; // index of other Mazecell blocked by wall at i-th edge, true by default
     index : number;
+
+    abstract getCounterIndex(wallIndex: number): number;
 
     constructor(points: [number, number][], index: number) {
         this.points = points
@@ -114,7 +141,7 @@ class MazeCell{
             let ny = this.points[(i+1)%this.points.length][1] * cellSize;
             if (this.blocked[i]) {
                 ctx.beginPath();
-                ctx.moveTo(left + cx, top+ cy);
+                ctx.moveTo(left + cx, top + cy);
                 ctx.lineTo(left + nx, top + ny);
                 ctx.stroke();
             }
@@ -132,7 +159,10 @@ class MazeCell{
     }
 
     openWall(index: number) {
-        this.blocked[index] = true;
+        this.blocked[index] = false;
+        if (this.connected[index]!= null) {
+            this.connected[index].blocked[this.getCounterIndex(index)] = false;
+        }
     }
 }
 
@@ -145,5 +175,9 @@ class MazeCellSquare extends MazeCell{
         points.push([1,1])
         points.push([0,1])
         super(points, index)
+    }
+
+    getCounterIndex(wallIndex : number) {
+        return (wallIndex+2)%4
     }
 }

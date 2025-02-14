@@ -4,7 +4,7 @@ import Maze from '../components/maze'
 
 export default function MazeCanvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const CANVASSIZE = 800;
+    const CANVASSIZE = 700;
     const MAZESIZE = 600;
     const PADDING = (CANVASSIZE - MAZESIZE)/2;
     const [maze, setMaze] = useState<Maze|null>(null);
@@ -21,8 +21,15 @@ export default function MazeCanvas() {
         ctx.fillStyle = "white";
         ctx.fillRect(0,0, canvas.width, canvas.height);
 
-        setMaze(new Maze(20, 20, "square", ctx));
+        setMaze(new Maze(5, 5, "square", ctx));
     };
+
+    const generateOne = () => {
+        if (maze) {
+            maze.generateOne();
+            maze.draw(PADDING, PADDING, MAZESIZE);
+        }
+    }
 
     useEffect(() => {
         initialize();
@@ -40,7 +47,7 @@ export default function MazeCanvas() {
         <div className="text-white bg-zinc-950 m-3 p-2 rounded-md w-auto text-center text-2xl h-fit font-bold">
             Maze Generator
         </div>
-        <div className='flex flex-row justify-start'>
+        <div className='flex flex-row'>
             <div>
                 <button className='bg-gray-200 m-5 w-16 h-16 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors'
                  onClick={initialize}>
@@ -50,7 +57,9 @@ export default function MazeCanvas() {
             <canvas ref={canvasRef} className="m-3 rounded-3xl">
             </canvas>
             <div>
-                <button className='bg-transparent m-5 w-16 h-16 rounded-full flex items-center justify-center'>
+                <button className='bg-gray-200 m-5 w-16 h-16 pl-1 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors'
+                 onClick={generateOne}>
+                    <div className='w-0 h-0 border-t-[16px] border-t-transparent border-l-[27px] border-l-black border-b-[16px] border-b-transparent'></div>
                 </button>
             </div>
         </div>
